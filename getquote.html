@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cape Freights and Logistic Services</title>
+    <!-- Link to Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="capewebmob.css">
+</head>
+<body>
+
+    <!-- Get a Quote Section with Additional Address Inputs -->
+    <section id="quote" class="section">
+        <h2>Get a Quote</h2>
+        <form id="quote-form" action="#" method="post">
+            <!-- Dropdown for Service Selection -->
+            <select id="service-dropdown" name="service-type" required style="width: 100%; font-size: 18px;">
+                <option value="" disabled selected>Select a Service</option>
+                <option value="door-to-door">Door-to-Door Delivery</option>
+                <option value="ocean-shipping">Ocean Shipping</option>
+                <option value="air-shipping">Air Shipping</option>
+                <option value="interstate-delivery">Inter-State Delivery</option>
+            </select>
+
+            <!-- Selected service will appear here -->
+            <input type="text" id="selected-service" name="selected-service" placeholder="Selected Service" readonly style="width: 100%; font-size: 18px; margin-top: 10px;">
+
+            <!-- Other Inputs -->
+            <input type="text" name="name" placeholder="Your Name" required>
+            <input type="email" name="email" placeholder="Your Email" required>
+            <input type="tel" name="phone" placeholder="Your Phone Number" required>
+
+            <!-- Address Inputs (Initially Hidden) -->
+            <div id="address-fields" style="display:none;">
+                <!-- Country -->
+                <input type="text" id="country" name="country" placeholder="Country" style="width: 100%;">
+                <!-- State -->
+                <input type="text" id="state" name="state" placeholder="State" style="width: 100%;">
+                <!-- Province or Local Government -->
+                <input type="text" id="province" name="province" placeholder="Province or Local Government" style="width: 100%;">
+                <!-- House Number -->
+                <input type="text" id="house-number" name="house-number" placeholder="House Number" style="width: 100%;">
+                <!-- Office or Home -->
+                <select id="office-home" name="office-home" style="width: 100%;">
+                    <option value="" disabled selected>Is it an Office or Home?</option>
+                    <option value="office">Office</option>
+                    <option value="home">Home</option>
+                </select>
+                <!-- Building Number -->
+                <input type="text" id="building-number" name="building-number" placeholder="Building Number" style="width: 100%;">
+            </div>
+
+            <textarea name="details" placeholder="Shipping Details" required></textarea>
+            <button type="submit">Request Quote</button>
+        </form>
+    </section>
+
+    <script>
+        // Display selected service in another input box
+        document.getElementById('service-dropdown').addEventListener('change', function() {
+            const selectedService = this.options[this.selectedIndex].text;
+            document.getElementById('selected-service').value = selectedService;
+
+            // Show address fields for specific services and make required fields
+            const addressFields = document.getElementById('address-fields');
+            const serviceValue = this.value;
+
+            // Reset required attributes
+            document.querySelectorAll('#address-fields input, #address-fields select').forEach(input => {
+                input.required = false;
+                input.style.display = 'none'; // Hide all fields initially
+            });
+
+            addressFields.style.display = 'block'; // Show address fields
+
+            // Determine which fields to show and make required based on the service
+            if (serviceValue === 'ocean-shipping' || serviceValue === 'air-shipping') {
+                // Require all fields for Ocean and Air Shipping
+                ['country', 'state', 'province', 'house-number', 'office-home', 'building-number'].forEach(id => {
+                    document.getElementById(id).required = true;
+                    document.getElementById(id).style.display = 'block'; // Show these fields
+                });
+            } else if (serviceValue === 'door-to-door') {
+                // Require State, Province, and Building Number for Door-to-Door Delivery
+                ['state', 'province', 'building-number'].forEach(id => {
+                    document.getElementById(id).required = true;
+                    document.getElementById(id).style.display = 'block'; // Show these fields
+                });
+            } else if (serviceValue === 'interstate-delivery') {
+                // Require State and Province for Inter-State Delivery
+                ['state', 'province'].forEach(id => {
+                    document.getElementById(id).required = true;
+                    document.getElementById(id).style.display = 'block'; // Show these fields
+                });
+            }
+        });
+
+        // Confirmation before form submission
+        document.getElementById('quote-form').addEventListener('submit', function(event) {
+            // Gather form data for the confirmation dialog
+            const service = document.getElementById('selected-service').value;
+            const name = document.querySelector('input[name="name"]').value;
+            const email = document.querySelector('input[name="email"]').value;
+            const phone = document.querySelector('input[name="phone"]').value;
+            const details = document.querySelector('textarea[name="details"]').value;
+
+            // Create a confirmation message
+            const confirmationMessage = `
+                Please confirm your details:\n
+                Service: ${service}\n
+                Name: ${name}\n
+                Email: ${email}\n
+                Phone: ${phone}\n
+                Shipping Details: ${details}\n
+                \n
+                Do you want to submit this information?`;
+
+            // Display the confirmation dialog
+            const userConfirmed = confirm(confirmationMessage);
+
+            // If the user cancels, prevent the form submission
+            if (!userConfirmed) {
+                event.preventDefault();
+            }
+        });
+    </script>
+</body>
+</html>
